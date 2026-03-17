@@ -1,1066 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Qiang Fu — Yale CS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --color-bg:           #f8f4ed;
-      --color-surface:      #efe9dc;
-      --color-surface-2:    #e6ddd0;
-      --color-accent:       #c9a84c;
-      --color-accent-dark:  #a8862e;
-      --color-text:         #1a2340;
-      --color-muted:        #8a8070;
-      --color-border:       #d8cfc0;
-
-      --font-display: 'Cormorant Garamond', Georgia, serif;
-      --font-body:    'Lora', Georgia, serif;
-
-      --max-width: 900px;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background-color: var(--color-bg);
-      color: var(--color-text);
-      font-family: var(--font-body);
-      font-size: 20px;
-      line-height: 1.75;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── Grain overlay ──────────────────────────────────── */
-    .grain-overlay {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ── Navigation ─────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 1.25rem 2.5rem;
-      transition: background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease;
-      border-bottom: 1px solid transparent;
-    }
-
-    nav.scrolled {
-      background: rgba(248, 244, 237, 0.88);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-color: var(--color-border);
-    }
-
-    .nav-inner {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .nav-name {
-      font-family: var(--font-display);
-      font-size: 1.2rem;
-      font-weight: 500;
-      color: var(--color-text);
-      letter-spacing: 0.01em;
-      text-decoration: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-family: var(--font-body);
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    .nav-links a:hover { color: var(--color-text); }
-
-    /* ── Hero ────────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 7rem 2.5rem 5rem;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-    }
-
-    /* Decorative "H" for Hamiltonian — domain easter egg */
-    .hero-bg-glyph {
-      position: absolute;
-      font-family: var(--font-display);
-      font-style: italic;
-      font-size: 62vw;
-      line-height: 0.85;
-      color: var(--color-accent);
-      opacity: 0.032;
-      user-select: none;
-      pointer-events: none;
-      right: -12%;
-      bottom: -10%;
-      z-index: 0;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 640px;
-    }
-
-    .hero-photo {
-      width: 148px;
-      height: 148px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: center top;
-      border: 2px solid var(--color-accent);
-      box-shadow:
-        0 0 0 7px rgba(201, 168, 76, 0.12),
-        0 12px 40px rgba(26, 35, 64, 0.1);
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeUp 0.8s ease forwards 0.1s;
-    }
-
-    .hero-name {
-      font-family: var(--font-display);
-      font-size: clamp(3.2rem, 9vw, 5.75rem);
-      font-weight: 600;
-      letter-spacing: 0.025em;
-      line-height: 1;
-      color: var(--color-text);
-      opacity: 0;
-      animation: fadeUp 0.75s ease forwards 0.28s;
-      margin-bottom: 0.6rem;
-    }
-
-    .hero-ornament {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      margin: 0.9rem 0 1.1rem;
-      opacity: 0;
-      animation: fadeIn 0.5s ease forwards 0.46s;
-    }
-
-    .hero-ornament-line {
-      width: 32px;
-      height: 1px;
-      background: var(--color-accent);
-    }
-
-    .hero-ornament-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--color-accent);
-    }
-
-    .hero-subtitle {
-      font-family: var(--font-body);
-      font-style: italic;
-      font-size: 1.05rem;
-      color: var(--color-muted);
-      opacity: 0;
-      animation: fadeUp 0.75s ease forwards 0.52s;
-      margin-bottom: 1.25rem;
-      letter-spacing: 0.01em;
-    }
-
-    .hero-tagline {
-      font-family: var(--font-body);
-      font-size: 1.02rem;
-      line-height: 1.85;
-      color: var(--color-text);
-      opacity: 0;
-      animation: fadeUp 0.75s ease forwards 0.66s;
-      margin-bottom: 2.25rem;
-    }
-
-    .hero-links {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp 0.75s ease forwards 0.8s;
-    }
-
-    .hero-link {
-      font-family: var(--font-body);
-      font-size: 0.75rem;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      text-decoration: none;
-      padding-bottom: 2px;
-      border-bottom: 1px solid var(--color-border);
-      transition: color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .hero-link:hover {
-      color: var(--color-text);
-      border-color: var(--color-accent);
-    }
-
-    .hero-link-primary {
-      font-family: var(--font-body);
-      font-size: 0.75rem;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: var(--color-bg);
-      background: var(--color-text);
-      text-decoration: none;
-      padding: 0.55rem 1.3rem;
-      border-radius: 2px;
-      transition: background 0.2s ease;
-    }
-
-    .hero-link-primary:hover { background: var(--color-accent-dark); }
-
-    /* Scroll indicator */
-    .scroll-indicator {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      opacity: 0;
-      animation: fadeIn 0.8s ease forwards 1.3s;
-    }
-
-    .scroll-indicator-text {
-      font-family: var(--font-body);
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--color-border);
-    }
-
-    .scroll-indicator-line {
-      width: 1px;
-      height: 38px;
-      background: linear-gradient(to bottom, var(--color-accent), transparent);
-      animation: scrollDrop 2s ease-in-out infinite 2s;
-    }
-
-    /* ── Layout ──────────────────────────────────────────── */
-    .container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 2.5rem;
-    }
-
-    section {
-      padding: 5.5rem 0;
-    }
-
-    section + section {
-      border-top: 1px solid var(--color-border);
-    }
-
-    .section-label {
-      font-family: var(--font-body);
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--color-accent-dark);
-      display: block;
-      margin-bottom: 0.75rem;
-    }
-
-    .section-heading {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4.5vw, 2.75rem);
-      font-weight: 500;
-      color: var(--color-text);
-      line-height: 1.1;
-      margin-bottom: 2.5rem;
-    }
-
-    /* ── Research ────────────────────────────────────────── */
-    .research-intro {
-      font-size: 1.08rem;
-      line-height: 1.9;
-      color: var(--color-text);
-      max-width: 680px;
-      margin-bottom: 1.75rem;
-    }
-
-    .research-intro em {
-      font-style: italic;
-      color: var(--color-accent-dark);
-    }
-
-    .topic-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.55rem;
-    }
-
-    .topic-tag {
-      font-family: var(--font-body);
-      font-size: 0.8rem;
-      padding: 0.3rem 0.85rem;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 2px;
-      color: var(--color-muted);
-      letter-spacing: 0.02em;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
-    }
-
-    .topic-tag:hover {
-      background: var(--color-surface-2);
-      color: var(--color-text);
-      border-color: var(--color-accent);
-    }
-
-    /* ── Publications ────────────────────────────────────── */
-    .pub-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-
-    .pub-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-left: 3px solid var(--color-border);
-      padding: 1.5rem 1.75rem;
-      border-radius: 3px;
-      transition: border-left-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .pub-card:hover {
-      border-left-color: var(--color-accent);
-      transform: translateX(4px);
-      box-shadow: 0 6px 24px rgba(26, 35, 64, 0.07);
-    }
-
-    .pub-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-bottom: 0.6rem;
-    }
-
-    .pub-badge {
-      font-family: var(--font-body);
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 500;
-      padding: 0.2rem 0.65rem;
-      border-radius: 2px;
-    }
-
-    .badge-spotlight  { background: var(--color-accent);   color: var(--color-text); }
-    .badge-neurips    { background: #1e2e52;                color: #f8f4ed; }
-    .badge-icml       { background: #2d4a8a;                color: #f8f4ed; }
-    .badge-workshop   { background: #3a5a7a;                color: #f8f4ed; }
-    .badge-journal    { background: #3a5c3a;                color: #f8f4ed; }
-    .badge-arxiv      { background: var(--color-surface-2); color: var(--color-muted); border: 1px solid var(--color-border); }
-    .badge-review     { background: var(--color-surface-2); color: var(--color-muted); border: 1px solid var(--color-border); font-style: italic; }
-
-    .pub-year {
-      font-family: var(--font-body);
-      font-size: 0.78rem;
-      color: var(--color-muted);
-    }
-
-    .pub-title {
-      font-family: var(--font-display);
-      font-style: italic;
-      font-size: 1.18rem;
-      font-weight: 500;
-      line-height: 1.4;
-      color: var(--color-text);
-      margin-bottom: 0.4rem;
-    }
-
-    .pub-authors {
-      font-family: var(--font-body);
-      font-size: 0.86rem;
-      color: var(--color-muted);
-    }
-
-    .pub-authors strong {
-      color: var(--color-text);
-      font-weight: 500;
-    }
-
-    /* ── Timeline ────────────────────────────────────────── */
-    .timeline {
-      position: relative;
-      padding-left: 1.75rem;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 10px;
-      bottom: 20px;
-      width: 1px;
-      background: var(--color-border);
-    }
-
-    .timeline-item {
-      position: relative;
-      padding-bottom: 2.75rem;
-    }
-
-    .timeline-item:last-child { padding-bottom: 0; }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -1.75rem;
-      top: 9px;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--color-accent);
-      transform: translateX(calc(-50% + 0.5px));
-    }
-
-    .timeline-period {
-      display: block;
-      font-family: var(--font-body);
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--color-accent-dark);
-      margin-bottom: 0.3rem;
-    }
-
-    .timeline-role {
-      font-family: var(--font-display);
-      font-size: 1.35rem;
-      font-weight: 500;
-      color: var(--color-text);
-      line-height: 1.2;
-      margin-bottom: 0.2rem;
-    }
-
-    .timeline-place {
-      font-family: var(--font-body);
-      font-style: italic;
-      font-size: 0.93rem;
-      color: var(--color-muted);
-      margin-bottom: 0.65rem;
-    }
-
-    .timeline-desc {
-      font-family: var(--font-body);
-      font-size: 0.93rem;
-      line-height: 1.75;
-      color: var(--color-text);
-      max-width: 640px;
-    }
-
-    /* ── Awards ──────────────────────────────────────────── */
-    .awards-list {
-      list-style: none;
-    }
-
-    .award-item {
-      display: grid;
-      grid-template-columns: 3.5rem 1fr;
-      gap: 1.5rem;
-      align-items: baseline;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .award-item:first-child {
-      border-top: 1px solid var(--color-border);
-    }
-
-    .award-year {
-      font-family: var(--font-body);
-      font-size: 0.76rem;
-      letter-spacing: 0.06em;
-      color: var(--color-accent-dark);
-      font-weight: 500;
-    }
-
-    .award-name {
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      color: var(--color-text);
-    }
-
-    .award-note {
-      font-size: 0.85rem;
-      color: var(--color-muted);
-      font-style: italic;
-    }
-
-    /* ── Skills & Service ────────────────────────────────── */
-    .skills-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-    }
-
-    .skills-group h3 {
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-      font-weight: 500;
-      color: var(--color-text);
-      margin-bottom: 1rem;
-      padding-bottom: 0.6rem;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .tag-set {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .tag {
-      font-family: var(--font-body);
-      font-size: 0.8rem;
-      padding: 0.28rem 0.8rem;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 2px;
-      color: var(--color-text);
-    }
-
-    /* ── Contact ─────────────────────────────────────────── */
-    .contact-body {
-      font-family: var(--font-body);
-      font-size: 1.05rem;
-      color: var(--color-text);
-      line-height: 1.85;
-      max-width: 560px;
-      margin-bottom: 2.5rem;
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-    }
-
-    .contact-item { display: flex; flex-direction: column; gap: 0.3rem; }
-
-    .contact-label {
-      font-family: var(--font-body);
-      font-size: 0.68rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-    }
-
-    .contact-value {
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      color: var(--color-text);
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    a.contact-value:hover { color: var(--color-accent-dark); }
-
-    /* ── Footer ──────────────────────────────────────────── */
-    footer {
-      padding: 2.25rem 2.5rem;
-      border-top: 1px solid var(--color-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .footer-name {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      color: var(--color-muted);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-links a {
-      font-family: var(--font-body);
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--color-border);
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    .footer-links a:hover { color: var(--color-muted); }
-
-    /* ── Animations ──────────────────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    @keyframes scrollDrop {
-      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
-      50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
-      100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
-    }
-
-    /* Scroll-triggered reveals */
-    .reveal {
-      opacity: 0;
-      transform: translateY(22px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .s1 { transition-delay: 0.05s; }
-    .s2 { transition-delay: 0.13s; }
-    .s3 { transition-delay: 0.21s; }
-    .s4 { transition-delay: 0.29s; }
-    .s5 { transition-delay: 0.37s; }
-    .s6 { transition-delay: 0.45s; }
-    .s7 { transition-delay: 0.53s; }
-
-    /* ── Responsive ──────────────────────────────────────── */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { gap: 1.25rem; }
-      .container { padding: 0 1.5rem; }
-      section { padding: 4rem 0; }
-      .hero { padding: 6rem 1.5rem 4rem; }
-      .skills-cols { grid-template-columns: 1fr; gap: 2rem; }
-      footer { flex-direction: column; align-items: flex-start; }
-    }
-
-    @media (max-width: 520px) {
-      .nav-links { display: none; }
-      .hero-photo { width: 116px; height: 116px; }
-      .award-item { grid-template-columns: 2.75rem 1fr; gap: 1rem; }
-      .timeline { padding-left: 1.25rem; }
-      .timeline-item::before { left: -1.25rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qiang Fu — Optimization, Sampling & Machine Learning</title>
+<meta name="description" content="Qiang Fu is a CS PhD student at Yale University researching optimization, sampling, and machine learning theory.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#faf8f5;
+  --surface:#f0ece6;
+  --accent:#7a2332;
+  --accent-light:rgba(122,35,50,0.08);
+  --ink:#1a1018;
+  --muted:#8a7e72;
+  --muted-light:#b5aa9e;
+  --white:#fff;
+}
+html{scroll-behavior:smooth;font-size:18px}
+body{
+  font-family:'Source Serif 4',Georgia,serif;
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(26,16,24,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(26,16,24,0.018) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+
+/* Utility */
+.container{max-width:860px;margin:0 auto;padding:0 24px}
+a{color:var(--accent);text-decoration:none;transition:opacity .2s}
+a:hover{opacity:.7}
+
+/* Animations */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero-anim{opacity:0;animation:fadeUp .7s ease forwards}
+.hero-anim:nth-child(1){animation-delay:.1s}
+.hero-anim:nth-child(2){animation-delay:.25s}
+.hero-anim:nth-child(3){animation-delay:.4s}
+.hero-anim:nth-child(4){animation-delay:.55s}
+.hero-anim:nth-child(5){animation-delay:.7s}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Nav */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(250,248,245,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(26,16,24,0.06);
+  padding:14px 0;
+}
+nav .container{display:flex;justify-content:space-between;align-items:center}
+nav .name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.15rem;color:var(--ink);letter-spacing:.01em}
+nav ul{list-style:none;display:flex;gap:28px}
+nav a{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+nav a:hover{color:var(--accent);opacity:1}
+
+/* Hero */
+.hero{
+  padding:100px 0 80px;
+  display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;
+}
+.hero-photo{
+  width:180px;height:180px;border-radius:50%;
+  object-fit:cover;object-position:center 20%;
+  border:3px solid var(--surface);
+  box-shadow:0 4px 24px rgba(26,16,24,0.08);
+}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:3.2rem;line-height:1.1;letter-spacing:-.02em;
+}
+.hero .subtitle{
+  font-family:'IBM Plex Mono',monospace;font-size:.92rem;
+  color:var(--accent);margin-top:10px;letter-spacing:.02em;
+}
+.hero .tagline{
+  font-size:1.08rem;color:var(--muted);margin-top:16px;max-width:520px;
+}
+.hero-links{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap}
+.hero-links a{
+  font-family:'IBM Plex Mono',monospace;font-size:.8rem;
+  padding:7px 16px;border:1px solid var(--muted-light);border-radius:4px;
+  color:var(--ink);transition:all .2s;
+}
+.hero-links a:hover{border-color:var(--accent);color:var(--accent);opacity:1}
+
+/* Sections */
+section{padding:64px 0}
+section+section{border-top:1px solid rgba(26,16,24,0.06)}
+.section-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--accent);
+  margin-bottom:32px;
+}
+
+/* About */
+.about-text{font-size:1.05rem;color:var(--ink);max-width:680px;line-height:1.8}
+
+/* Publications */
+.pub{margin-bottom:28px}
+.pub .authors{font-size:.92rem;color:var(--muted)}
+.pub .authors strong{color:var(--ink);font-weight:600}
+.pub .title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;margin:4px 0 2px;line-height:1.4}
+.pub .venue{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--accent);letter-spacing:.02em}
+.pub .venue .badge{
+  display:inline-block;background:var(--accent-light);color:var(--accent);
+  padding:2px 8px;border-radius:3px;font-weight:500;margin-left:4px;
+}
+
+/* Experience */
+.exp{margin-bottom:36px}
+.exp-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.exp-place{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.inst-logo{width:22px;height:22px;object-fit:contain;flex-shrink:0}
+.exp-date{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted)}
+.exp-role{font-size:.95rem;color:var(--muted);margin:4px 0 8px}
+.exp ul{padding-left:20px;color:var(--ink);font-size:.95rem}
+.exp li{margin-bottom:6px}
+
+/* Education */
+.edu{margin-bottom:28px}
+.edu-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.edu-school{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.edu-date{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted)}
+.edu-detail{font-size:.95rem;color:var(--muted);margin-top:2px}
+
+/* Skills */
+.skill-group{margin-bottom:20px}
+.skill-group-label{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{
+  font-family:'IBM Plex Mono',monospace;font-size:.8rem;
+  padding:5px 14px;background:var(--surface);border-radius:4px;color:var(--ink);
+}
+
+/* Awards */
+.award{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(26,16,24,0.04);flex-wrap:wrap;gap:4px}
+.award:last-child{border-bottom:none}
+.award-name{font-size:.95rem}
+.award-year{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted)}
+
+/* Talks */
+.talk{margin-bottom:20px}
+.talk-venue{font-size:.95rem;font-weight:600}
+.talk-title{font-size:.9rem;color:var(--muted);font-style:italic;margin-top:2px}
+.talk-year{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--accent)}
+
+/* Service */
+.service-text{font-size:.98rem;color:var(--ink)}
+
+/* Footer */
+footer{
+  padding:48px 0;border-top:1px solid rgba(26,16,24,0.06);
+  text-align:center;
+}
+footer .name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700}
+footer .links{margin-top:12px;display:flex;justify-content:center;gap:20px}
+footer .links a{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted)}
+footer .links a:hover{color:var(--accent)}
+footer .copy{font-size:.75rem;color:var(--muted-light);margin-top:16px}
+
+/* Mobile */
+@media(max-width:640px){
+  .hero{grid-template-columns:1fr;text-align:center;padding:60px 0 48px}
+  .hero-photo{width:140px;height:140px;margin:0 auto}
+  .hero .tagline{margin-left:auto;margin-right:auto}
+  .hero-links{justify-content:center}
+  .hero h1{font-size:2.4rem}
+  nav ul{gap:16px}
+  nav a{font-size:.7rem}
+  .exp-header,.edu-header,.award{flex-direction:column;gap:2px}
+}
+</style>
 </head>
 <body>
 
-  <!-- SVG Paper Grain Overlay -->
-  <svg aria-hidden="true" class="grain-overlay" xmlns="http://www.w3.org/2000/svg">
-    <filter id="grain">
-      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="3" stitchTiles="stitch"/>
-    </filter>
-    <rect width="100%" height="100%" filter="url(#grain)" opacity="0.04"/>
-  </svg>
+<nav>
+  <div class="container">
+    <span class="name">Qiang Fu</span>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#publications">Papers</a></li>
+      <li><a href="#experience">Research</a></li>
+      <li><a href="#education">Education</a></li>
+    </ul>
+  </div>
+</nav>
 
-  <!-- ── Navigation ── -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="#" class="nav-name">Qiang Fu</a>
-      <ul class="nav-links">
-        <li><a href="#research">Research</a></li>
-        <li><a href="#publications">Publications</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#awards">Awards</a></li>
-        <li><a href="#contact">Contact</a></li>
+<header class="container hero">
+  <div>
+    <h1 class="hero-anim">Qiang Fu</h1>
+    <p class="subtitle hero-anim">Ph.D. Student · Yale Computer Science</p>
+    <p class="tagline hero-anim">Developing provably efficient algorithms for optimization and sampling to improve the training and inference of modern machine learning models.</p>
+    <div class="hero-links hero-anim">
+      <a href="mailto:qiang.fu@yale.edu">Email</a>
+      <a href="https://scholar.google.com/citations?user=QIANG_FU" target="_blank" rel="noopener">Google Scholar</a>
+      <a href="Qiang_Fu.pdf" download>Resume PDF</a>
+    </div>
+  </div>
+  <img src="photo.png" alt="Photo of Qiang Fu" class="hero-photo hero-anim">
+</header>
+
+<main>
+
+<section id="about">
+  <div class="container reveal">
+    <p class="section-label">About</p>
+    <p class="about-text">I am a Ph.D. student in Computer Science at Yale University, advised by <a href="https://www.cs.yale.edu/homes/wibisono/" target="_blank" rel="noopener">Prof. Andre Wibisono</a>. My research lies broadly in optimization, statistics, and machine learning. I am particularly focused on developing provably efficient algorithms for optimization and sampling to improve the training and inference of modern machine learning models. Previously, I received my M.S. and B.S. in Mathematics from Sun Yat-sen University.</p>
+  </div>
+</section>
+
+<section id="publications">
+  <div class="container reveal">
+    <p class="section-label">Publications</p>
+
+    <div class="pub">
+      <p class="authors">Kyurae Kim, <strong>Qiang Fu</strong>, Yi-An Ma, Jacob R. Gardner, Trevor Campbell</p>
+      <p class="title">Stochastic Gradient Variational Inference with Price's Gradient Estimator from Bures-Wasserstein to Parameter Space</p>
+      <p class="venue">arXiv Preprint, 2026</p>
+    </div>
+
+    <div class="pub">
+      <p class="authors"><strong>Qiang Fu</strong>, Andre Wibisono</p>
+      <p class="title">Hamiltonian Descent Algorithms for Optimization: Accelerated Rates via Randomized Integration Time</p>
+      <p class="venue">NeurIPS 2025 <span class="badge">Spotlight</span></p>
+    </div>
+
+    <div class="pub">
+      <p class="authors"><strong>Qiang Fu</strong>, Siddharth Mitra, Vishwak Srinivasan, Xiuyuan Wang, Andre Wibisono, Ashia Wilson</p>
+      <p class="title">Accelerated Convex Optimization via Hamiltonian Dynamics with Deterministic Integration Time</p>
+      <p class="venue">Under review</p>
+    </div>
+
+    <div class="pub">
+      <p class="authors">Austin Feng, <strong>Qiang Fu</strong>, Xiuyuan Wang, Andre Wibisono</p>
+      <p class="title">From Randomized Hamiltonian Flow to Fast Stochastic Optimization</p>
+      <p class="venue">NeurIPS 2025 Workshop on Dynamics at the Frontiers of Optimization, Sampling, and Games</p>
+    </div>
+
+    <div class="pub">
+      <p class="authors"><strong>Qiang Fu</strong>, Ashia Wilson</p>
+      <p class="title">Mean-field Underdamped Langevin Dynamics and its Spacetime Discretization</p>
+      <p class="venue">ICML 2024</p>
+    </div>
+
+    <div class="pub">
+      <p class="authors"><strong>Qiang Fu</strong>, Dongchu Xu, Ashia Wilson</p>
+      <p class="title">Accelerated Stochastic Optimization Methods under Quasar-convexity</p>
+      <p class="venue">ICML 2023</p>
+    </div>
+
+    <div class="pub">
+      <p class="authors">Xiangkai Lian, <strong>Qiang Fu</strong>, Weijie Su, Xinyu Zhang, Jia Li, Zhengan Yao</p>
+      <p class="title">The Fractional Laplacian-based Image Inpainting</p>
+      <p class="venue">Inverse Problems and Imaging, 2024</p>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="container reveal">
+    <p class="section-label">Research Experience</p>
+
+    <div class="exp">
+      <div class="exp-header">
+        <span class="exp-place"><img src="https://img.logo.dev/yale.edu?token=pk_A99Q8wXuTBS8jRVXjIxwBQ&size=64&format=png" alt="Yale logo" class="inst-logo">Yale University, Department of Computer Science</span>
+        <span class="exp-date">2024 – Present</span>
+      </div>
+      <p class="exp-role">Research Assistant · Advised by Prof. Andre Wibisono</p>
+      <ul>
+        <li>Research on generative models, exploring non-Gaussian priors in flow-based frameworks (flow matching, rectified flow, stochastic interpolants).</li>
+        <li>Designing new optimizers for LLM pretraining based on Hamiltonian flows.</li>
+        <li>Accelerating convex optimization and bridging optimization and sampling via Hamiltonian flow (NeurIPS 2025, Spotlight).</li>
       </ul>
     </div>
-  </nav>
 
-  <!-- ── Hero ── -->
-  <section class="hero" id="home">
-    <div class="hero-bg-glyph" aria-hidden="true">H</div>
-    <div class="hero-content">
-      <img src="photo.png" alt="Qiang Fu" class="hero-photo">
-      <h1 class="hero-name">Qiang Fu</h1>
-      <div class="hero-ornament" aria-hidden="true">
-        <div class="hero-ornament-line"></div>
-        <div class="hero-ornament-dot"></div>
-        <div class="hero-ornament-line"></div>
+    <div class="exp">
+      <div class="exp-header">
+        <span class="exp-place"><img src="https://img.logo.dev/mit.edu?token=pk_A99Q8wXuTBS8jRVXjIxwBQ&size=64&format=png" alt="MIT logo" class="inst-logo">MIT EECS</span>
+        <span class="exp-date">2022 – 2024</span>
       </div>
-      <p class="hero-subtitle">PhD Candidate &thinsp;&middot;&thinsp; Computer Science &thinsp;&middot;&thinsp; Yale University</p>
-      <p class="hero-tagline">
-        Developing provably efficient algorithms for optimization and sampling —<br>
-        bridging mathematical theory and the training of modern machine learning models.
-      </p>
-      <div class="hero-links">
-        <a href="mailto:qiang.fu@yale.edu" class="hero-link">Email</a>
-        <a href="#publications" class="hero-link">Publications</a>
-        <a href="https://scholar.google.com" target="_blank" rel="noopener" class="hero-link">Google Scholar</a>
-        <a href="Qiang_Fu.pdf" download class="hero-link-primary">Download CV</a>
-      </div>
-    </div>
-    <div class="scroll-indicator" aria-hidden="true">
-      <span class="scroll-indicator-text">Scroll</span>
-      <div class="scroll-indicator-line"></div>
-    </div>
-  </section>
-
-  <!-- ── Research ── -->
-  <section id="research">
-    <div class="container">
-      <span class="section-label reveal">Research Interest</span>
-      <h2 class="section-heading reveal">Optimization &amp; Sampling</h2>
-      <p class="research-intro reveal">
-        My research lies broadly in <em>optimization</em>, <em>statistics</em>, and <em>machine learning</em>.
-        I am particularly focused on developing provably efficient algorithms for optimization and sampling
-        to improve the training and inference of modern machine learning models — with a special interest
-        in the elegant geometry of <em>Hamiltonian dynamics</em> and its role in bridging
-        continuous-time flows, accelerated optimization, and probabilistic sampling.
-      </p>
-      <div class="topic-grid reveal">
-        <span class="topic-tag">Hamiltonian Dynamics</span>
-        <span class="topic-tag">Convex Optimization</span>
-        <span class="topic-tag">Sampling Algorithms</span>
-        <span class="topic-tag">Langevin Dynamics</span>
-        <span class="topic-tag">Stochastic Optimization</span>
-        <span class="topic-tag">Generative Models</span>
-        <span class="topic-tag">Flow Matching</span>
-        <span class="topic-tag">Variational Inference</span>
-        <span class="topic-tag">LLM Pretraining</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Publications ── -->
-  <section id="publications">
-    <div class="container">
-      <span class="section-label reveal">Selected Works</span>
-      <h2 class="section-heading reveal">Publications</h2>
-      <div class="pub-list">
-
-        <article class="pub-card reveal s1">
-          <div class="pub-meta">
-            <span class="pub-badge badge-spotlight">&#9733;&ensp;NeurIPS 2025 Spotlight</span>
-            <span class="pub-year">2025</span>
-          </div>
-          <h3 class="pub-title">Hamiltonian Descent Algorithms for Optimization: Accelerated Rates via Randomized Integration Time</h3>
-          <p class="pub-authors"><strong>Qiang Fu</strong>, Andre Wibisono</p>
-        </article>
-
-        <article class="pub-card reveal s2">
-          <div class="pub-meta">
-            <span class="pub-badge badge-review">Under Review</span>
-            <span class="pub-year">2025</span>
-          </div>
-          <h3 class="pub-title">Accelerated Convex Optimization via Hamiltonian Dynamics with Deterministic Integration Time</h3>
-          <p class="pub-authors"><strong>Qiang Fu</strong>, Siddharth Mitra, Vishwak Srinivasan, Xiuyuan Wang, Andre Wibisono, Ashia Wilson</p>
-        </article>
-
-        <article class="pub-card reveal s3">
-          <div class="pub-meta">
-            <span class="pub-badge badge-icml">ICML 2024</span>
-            <span class="pub-year">2024</span>
-          </div>
-          <h3 class="pub-title">Mean-field Underdamped Langevin Dynamics and its Spacetime Discretization</h3>
-          <p class="pub-authors"><strong>Qiang Fu</strong>, Ashia Wilson</p>
-        </article>
-
-        <article class="pub-card reveal s4">
-          <div class="pub-meta">
-            <span class="pub-badge badge-journal">Inv. Problems &amp; Imaging 2024</span>
-            <span class="pub-year">2024</span>
-          </div>
-          <h3 class="pub-title">The Fractional Laplacian-based Image Inpainting</h3>
-          <p class="pub-authors">Xiangkai Lian, <strong>Qiang Fu</strong>, Weijie Su, Xinyu Zhang, Jia Li, Zhengan Yao</p>
-        </article>
-
-        <article class="pub-card reveal s5">
-          <div class="pub-meta">
-            <span class="pub-badge badge-icml">ICML 2023</span>
-            <span class="pub-year">2023</span>
-          </div>
-          <h3 class="pub-title">Accelerated Stochastic Optimization Methods under Quasar-convexity</h3>
-          <p class="pub-authors"><strong>Qiang Fu</strong>, Dongchu Xu, Ashia Wilson</p>
-        </article>
-
-        <article class="pub-card reveal s6">
-          <div class="pub-meta">
-            <span class="pub-badge badge-workshop">NeurIPS 2025 Workshop</span>
-            <span class="pub-year">2025</span>
-          </div>
-          <h3 class="pub-title">From Randomized Hamiltonian Flow to Fast Stochastic Optimization</h3>
-          <p class="pub-authors">Austin Feng, <strong>Qiang Fu</strong>, Xiuyuan Wang, Andre Wibisono</p>
-        </article>
-
-        <article class="pub-card reveal s7">
-          <div class="pub-meta">
-            <span class="pub-badge badge-arxiv">arXiv Preprint</span>
-            <span class="pub-year">2026</span>
-          </div>
-          <h3 class="pub-title">Stochastic Gradient Variational Inference with Price's Gradient Estimator from Bures-Wasserstein to Parameter Space</h3>
-          <p class="pub-authors">Kyurae Kim, <strong>Qiang Fu</strong>, Yi-An Ma, Jacob R. Gardner, Trevor Campbell</p>
-        </article>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Research Experience ── -->
-  <section id="experience">
-    <div class="container">
-      <span class="section-label reveal">Background</span>
-      <h2 class="section-heading reveal">Research Experience</h2>
-      <div class="timeline">
-
-        <div class="timeline-item reveal s1">
-          <span class="timeline-period">2024 &mdash; Present</span>
-          <h3 class="timeline-role">Research Assistant</h3>
-          <p class="timeline-place">Yale University, Department of Computer Science &mdash; advised by Prof. Andre Wibisono</p>
-          <p class="timeline-desc">
-            Researching non-Gaussian priors in flow-based generative models (flow matching, rectified flow, stochastic interpolants);
-            designing novel LLM pretraining optimizers based on Hamiltonian flows;
-            advancing the theory of accelerated convex optimization via Hamiltonian dynamics.
-          </p>
-        </div>
-
-        <div class="timeline-item reveal s2">
-          <span class="timeline-period">2022 &mdash; 2024</span>
-          <h3 class="timeline-role">Research Student</h3>
-          <p class="timeline-place">MIT, Department of EECS &mdash; advised by Prof. Ashia Wilson</p>
-          <p class="timeline-desc">
-            Developed provably convergent algorithms for training two-layer neural networks via
-            spacetime discretization of mean-field underdamped Langevin dynamics (ICML 2024);
-            designed new accelerated stochastic optimization algorithms for quasar-convex functions
-            with applications to linear dynamical systems and generalized linear models (ICML 2023).
-          </p>
-        </div>
-
-        <div class="timeline-item reveal s3">
-          <span class="timeline-period">2021 &mdash; 2022</span>
-          <h3 class="timeline-role">Research Student</h3>
-          <p class="timeline-place">Sun Yat-sen University, School of Mathematics</p>
-          <p class="timeline-desc">
-            Collaborated on fractional Laplacian-based image inpainting methods,
-            developing theoretical guarantees and numerical algorithms.
-            Published in <em>Inverse Problems and Imaging</em>.
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Education ── -->
-  <section id="education">
-    <div class="container">
-      <span class="section-label reveal">Academic Training</span>
-      <h2 class="section-heading reveal">Education</h2>
-      <div class="timeline">
-
-        <div class="timeline-item reveal s1">
-          <span class="timeline-period">2024 &mdash; Present</span>
-          <h3 class="timeline-role">PhD in Computer Science</h3>
-          <p class="timeline-place">Yale University &mdash; New Haven, CT, USA</p>
-          <p class="timeline-desc">Advised by Prof. Andre Wibisono. Supported by Yale University PhD Fellowship (2024) and Yale GSA Conference Travel Fellowship (2025).</p>
-        </div>
-
-        <div class="timeline-item reveal s2">
-          <span class="timeline-period">2021 &mdash; 2024</span>
-          <h3 class="timeline-role">M.S. in Mathematics</h3>
-          <p class="timeline-place">Sun Yat-sen University &mdash; Guangzhou, China</p>
-          <p class="timeline-desc">School of Mathematics. National Scholarship recipient (2022, 2023). First Prize Scholarship (2022, 2023).</p>
-        </div>
-
-        <div class="timeline-item reveal s3">
-          <span class="timeline-period">2017 &mdash; 2021</span>
-          <h3 class="timeline-role">B.S. in Mathematics</h3>
-          <p class="timeline-place">Sun Yat-sen University &mdash; Guangzhou, China</p>
-          <p class="timeline-desc">School of Mathematics. First Prize Scholarship (2021). Meritorious Winner, Mathematical Contest in Modeling (2022).</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Awards ── -->
-  <section id="awards">
-    <div class="container">
-      <span class="section-label reveal">Recognition</span>
-      <h2 class="section-heading reveal">Honors &amp; Awards</h2>
-      <ul class="awards-list reveal">
-        <li class="award-item s1">
-          <span class="award-year">2025</span>
-          <span class="award-name">Yale GSA Conference Travel Fellowship</span>
-        </li>
-        <li class="award-item s2">
-          <span class="award-year">2024</span>
-          <span class="award-name">Yale University PhD Fellowship</span>
-        </li>
-        <li class="award-item s3">
-          <span class="award-year">2023</span>
-          <span class="award-name">National Scholarship <span class="award-note">(top 0.2%, Ministry of Education, China)</span></span>
-        </li>
-        <li class="award-item s4">
-          <span class="award-year">2023</span>
-          <span class="award-name">First Prize Scholarship <span class="award-note">&mdash; Sun Yat-sen University</span></span>
-        </li>
-        <li class="award-item s5">
-          <span class="award-year">2022</span>
-          <span class="award-name">National Scholarship <span class="award-note">(top 0.2%, Ministry of Education, China)</span></span>
-        </li>
-        <li class="award-item s5">
-          <span class="award-year">2022</span>
-          <span class="award-name">First Prize Scholarship <span class="award-note">&mdash; Sun Yat-sen University</span></span>
-        </li>
-        <li class="award-item s6">
-          <span class="award-year">2022</span>
-          <span class="award-name">Meritorious Winner <span class="award-note">&mdash; Mathematical Contest in Modeling</span></span>
-        </li>
-        <li class="award-item s7">
-          <span class="award-year">2021</span>
-          <span class="award-name">First Prize Scholarship <span class="award-note">&mdash; Sun Yat-sen University</span></span>
-        </li>
+      <p class="exp-role">Research Student · Advised by Prof. Ashia Wilson</p>
+      <ul>
+        <li>Fast algorithms for training two-layer neural networks via spacetime discretization of mean-field underdamped Langevin dynamics (ICML 2024).</li>
+        <li>Provably accelerated stochastic optimization for quasar-convex functions with applications in linear dynamical systems and GLMs (ICML 2023).</li>
       </ul>
     </div>
-  </section>
 
-  <!-- ── Skills & Service ── -->
-  <section id="skills">
-    <div class="container">
-      <span class="section-label reveal">Tools &amp; Community</span>
-      <h2 class="section-heading reveal">Skills &amp; Service</h2>
-      <div class="skills-cols">
-        <div class="skills-group reveal">
-          <h3>Programming</h3>
-          <div class="tag-set">
-            <span class="tag">Python</span>
-            <span class="tag">PyTorch</span>
-            <span class="tag">scikit-learn</span>
-            <span class="tag">NumPy</span>
-            <span class="tag">pandas</span>
-            <span class="tag">MATLAB</span>
-            <span class="tag">LaTeX</span>
-          </div>
-        </div>
-        <div class="skills-group reveal">
-          <h3>Reviewing</h3>
-          <div class="tag-set">
-            <span class="tag">AISTATS 2023</span>
-            <span class="tag">ICLR 2025</span>
-            <span class="tag">NeurIPS 2025</span>
-            <span class="tag">ICLR 2026</span>
-            <span class="tag">ALT 2026</span>
-          </div>
-        </div>
+    <div class="exp">
+      <div class="exp-header">
+        <span class="exp-place"><img src="https://img.logo.dev/sysu.edu.cn?token=pk_A99Q8wXuTBS8jRVXjIxwBQ&size=64&format=png" alt="SYSU logo" class="inst-logo">Sun Yat-sen University, School of Mathematics</span>
+        <span class="exp-date">2021 – 2022</span>
+      </div>
+      <p class="exp-role">Research Student</p>
+      <ul>
+        <li>Collaborated on fractional Laplacian-based image inpainting (IPI 2023).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="container reveal">
+    <p class="section-label">Education</p>
+
+    <div class="edu">
+      <div class="edu-header">
+        <span class="edu-school"><img src="https://img.logo.dev/yale.edu?token=pk_A99Q8wXuTBS8jRVXjIxwBQ&size=64&format=png" alt="Yale logo" class="inst-logo">Yale University</span>
+        <span class="edu-date">2024 – Present</span>
+      </div>
+      <p class="edu-detail">Ph.D. in Computer Science · Advised by Prof. Andre Wibisono</p>
+    </div>
+
+    <div class="edu">
+      <div class="edu-header">
+        <span class="edu-school"><img src="https://img.logo.dev/sysu.edu.cn?token=pk_A99Q8wXuTBS8jRVXjIxwBQ&size=64&format=png" alt="SYSU logo" class="inst-logo">Sun Yat-sen University</span>
+        <span class="edu-date">2021 – 2024</span>
+      </div>
+      <p class="edu-detail">M.S. in Mathematics</p>
+    </div>
+
+    <div class="edu">
+      <div class="edu-header">
+        <span class="edu-school"><img src="https://img.logo.dev/sysu.edu.cn?token=pk_A99Q8wXuTBS8jRVXjIxwBQ&size=64&format=png" alt="SYSU logo" class="inst-logo">Sun Yat-sen University</span>
+        <span class="edu-date">2017 – 2021</span>
+      </div>
+      <p class="edu-detail">B.S. in Mathematics</p>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container reveal">
+    <p class="section-label">Skills</p>
+    <div class="skill-group">
+      <p class="skill-group-label">Programming</p>
+      <div class="tags">
+        <span class="tag">Python</span><span class="tag">PyTorch</span><span class="tag">scikit-learn</span><span class="tag">NumPy</span><span class="tag">pandas</span><span class="tag">MATLAB</span><span class="tag">LaTeX</span>
       </div>
     </div>
-  </section>
-
-  <!-- ── Contact ── -->
-  <section id="contact">
-    <div class="container">
-      <span class="section-label reveal">Get in Touch</span>
-      <h2 class="section-heading reveal">Contact</h2>
-      <p class="contact-body reveal">
-        I am always happy to discuss research, potential collaborations, or questions about my work.
-        Feel free to reach out by email.
-      </p>
-      <div class="contact-grid reveal">
-        <div class="contact-item">
-          <span class="contact-label">Email</span>
-          <a href="mailto:qiang.fu@yale.edu" class="contact-value">qiang.fu@yale.edu</a>
-        </div>
-        <div class="contact-item">
-          <span class="contact-label">Location</span>
-          <span class="contact-value">10 Hillhouse Ave, New Haven, CT</span>
-        </div>
-        <div class="contact-item">
-          <span class="contact-label">Curriculum Vitae</span>
-          <a href="Qiang_Fu.pdf" download class="contact-value">Download PDF &rarr;</a>
-        </div>
-        <div class="contact-item">
-          <span class="contact-label">Google Scholar</span>
-          <a href="https://scholar.google.com" target="_blank" rel="noopener" class="contact-value">View Profile &rarr;</a>
-        </div>
+    <div class="skill-group">
+      <p class="skill-group-label">Languages</p>
+      <div class="tags">
+        <span class="tag">Chinese (native)</span><span class="tag">English (fluent)</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── Footer ── -->
-  <footer>
-    <span class="footer-name">Qiang Fu &thinsp;&middot;&thinsp; Yale University</span>
-    <div class="footer-links">
-      <a href="#research">Research</a>
-      <a href="#publications">Publications</a>
-      <a href="#contact">Contact</a>
+<section id="awards">
+  <div class="container reveal">
+    <p class="section-label">Honors & Awards</p>
+    <div class="award"><span class="award-name">Yale GSA Conference Travel Fellowship</span><span class="award-year">2025</span></div>
+    <div class="award"><span class="award-name">Yale University PhD Fellowships</span><span class="award-year">2024</span></div>
+    <div class="award"><span class="award-name">National Scholarship (top 0.2% in China)</span><span class="award-year">2023</span></div>
+    <div class="award"><span class="award-name">First Prize Scholarship, Sun Yat-sen University</span><span class="award-year">2023</span></div>
+    <div class="award"><span class="award-name">National Scholarship (top 0.2% in China)</span><span class="award-year">2022</span></div>
+    <div class="award"><span class="award-name">First Prize Scholarship, Sun Yat-sen University</span><span class="award-year">2022</span></div>
+    <div class="award"><span class="award-name">Meritorious Winner, Mathematical Contest in Modeling</span><span class="award-year">2022</span></div>
+    <div class="award"><span class="award-name">First Prize Scholarship, Sun Yat-sen University</span><span class="award-year">2021</span></div>
+  </div>
+</section>
+
+<section id="talks">
+  <div class="container reveal">
+    <p class="section-label">Talks & Presentations</p>
+
+    <div class="talk">
+      <p class="talk-year">2025</p>
+      <p class="talk-venue">NeurIPS 2025, San Diego — Spotlight Poster</p>
+      <p class="talk-title">Hamiltonian Descent Algorithms for Optimization: Accelerated Rates via Randomized Integration Time</p>
+    </div>
+
+    <div class="talk">
+      <p class="talk-year">2025</p>
+      <p class="talk-venue">Optimization and Statistical Learning Workshop, Columbia University — Poster</p>
+      <p class="talk-title">Hamiltonian Descent Algorithms for Optimization: Accelerated Rates via Randomized Integration Time</p>
+    </div>
+
+    <div class="talk">
+      <p class="talk-year">2024</p>
+      <p class="talk-venue">Yale FDS Conference: Recent Advances and Future Directions for Sampling — Poster</p>
+      <p class="talk-title">Mean-field Underdamped Langevin Dynamics and its Spacetime Discretization</p>
+    </div>
+
+    <div class="talk">
+      <p class="talk-year">2024</p>
+      <p class="talk-venue">ICML 2024, Vienna — Poster</p>
+      <p class="talk-title">Mean-field Underdamped Langevin Dynamics and its Spacetime Discretization</p>
+    </div>
+
+    <div class="talk">
+      <p class="talk-year">2023</p>
+      <p class="talk-venue">ICML 2023, Hawaii — Poster</p>
+      <p class="talk-title">Accelerated Stochastic Optimization Methods under Quasar-convexity</p>
+    </div>
+  </div>
+</section>
+
+<section id="service">
+  <div class="container reveal">
+    <p class="section-label">Service</p>
+    <p class="service-text">Reviewer: AISTATS 2023, ICLR 2025 & 2026, NeurIPS 2025, ALT 2026</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p class="name">Qiang Fu</p>
+    <div class="links">
+      <a href="mailto:qiang.fu@yale.edu">Email</a>
+      <a href="https://scholar.google.com/citations?user=QIANG_FU" target="_blank" rel="noopener">Scholar</a>
       <a href="Qiang_Fu.pdf" download>CV</a>
     </div>
-  </footer>
+    <p class="copy">&copy; 2026 Qiang Fu</p>
+  </div>
+</footer>
 
-  <script>
-    // Nav scroll effect
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 60);
-    }, { passive: true });
-
-    // Intersection Observer for scroll reveals
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -48px 0px' });
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  </script>
-
+<script>
+const o=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('visible');o.unobserve(el.target)}})},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>o.observe(el));
+</script>
 </body>
 </html>
