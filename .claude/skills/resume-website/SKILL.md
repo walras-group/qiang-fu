@@ -223,44 +223,52 @@ Use this as a starting point, then adapt based on what the specific resume revea
 
 ### Step 4: Ask the User's Design Preferences
 
-Use the `AskUserQuestion` tool to gather design preferences. Ask questions in a friendly, non-technical way since users may not know design terminology. Present clear options they can choose from.
+Use the `AskUserQuestion` tool to gather design preferences. Ask questions in a friendly, non-technical way since users may not know design terminology.
 
-**Question categories to ask (generate options dynamically based on the user's profession, industry, and resume content):**
+**The key principle: each question must adapt to what the user already answered.** Don't batch all questions upfront and present pre-generated options — the choices in later questions depend on what the user chose earlier. If you ask about typography before knowing whether they want light or dark, you'll suggest the wrong fonts.
 
-After analyzing the resume in Steps 2-3, generate 3-5 tailored options per category that make sense for this specific person. For example, a software engineer should see options like "terminal/CLI aesthetic" and "dark mode with syntax-highlighting accents", while a fashion designer should see "editorial lookbook" and "high-contrast monochrome with bold typography". Always include a "Something else" and a "Surprise me" escape hatch.
+#### Round 1 — The anchor decision: vibe + tone
 
-The categories to cover:
+Ask about overall vibe and light/dark direction together, since these are the two axes that everything else branches from. Generate 3-4 aesthetic directions tailored to their profession (e.g. a software engineer sees "terminal/precision", a designer sees "editorial/expressive"). Lead with your top recommendation and explain why it suits them specifically. Include a "Surprise me" option.
 
-1. **Overall vibe** — Suggest 3-4 aesthetic directions that fit their profession. Lead with your top recommendation and explain why it suits them. Each option should include a brief plain-language description of what it looks and feels like.
+Once you have their answer, **hold it as the anchor for everything that follows.**
 
-2. **Color preference** — Offer 4-5 color palettes curated for their industry. Describe each with mood words, not just color names (e.g., "deep navy + copper accents — feels authoritative and warm" rather than just "dark blue and orange"). Always include an option for the user to specify their own colors.
+#### Round 2 — Color + visual style (adapted to Round 1)
 
-3. **Visual style** — Present 3-4 design styles relevant to their field. Only show styles that actually make sense — a lawyer probably shouldn't see "brutalism" as the top pick, a creative coder probably shouldn't see "traditional corporate". Briefly explain each with a one-line "this feels like..." description.
+Now generate color palette options that actually work within the theme they chose. If they picked light, show light palettes — not "here are 5 options, 3 of which are dark". Same for visual style — show styles that are coherent with the vibe they chose. Use the Design Aesthetics Mandate's palette archetypes as a starting point and adapt them.
 
-4. **Typography feel** — Suggest 3-4 font personality directions that match the vibe. Reference the font options in the Design Aesthetics Mandate — describe the feeling each conveys in plain language (e.g., "a high-contrast editorial serif for headlines — feels like a magazine cover, not a website" rather than "use Playfair Display"). Do not suggest Inter, Roboto, Arial, or Space Grotesk.
+#### Round 3 — Typography + animation + background (adapted to Rounds 1–2)
 
-5. **Content layout** — Single page vs. multi-page, but frame the recommendation based on how much content their resume has. If they have 10+ years of experience and many projects, lean toward multi-page. If it's concise, suggest single page.
+Typography options should match both their field and the color/style they chose. A dark, terminal-aesthetic site should see monospace headline options; a light, editorial site should see high-contrast serifs. Animation and background texture should similarly be generated to feel at home within the choices already locked in — not pulled from a generic menu.
 
-6. **Photos/media** — Ask what assets they can provide (profile photo, project screenshots, videos, logos). Adapt suggestions to their role — ask a photographer about gallery images, ask a developer about project demos. **Explicitly prompt them to drop any photos or videos into the repo now** (before building) so you can reference them — e.g., "If you have a profile photo or any project screenshots/videos you'd like on the site, add them to the repo and let me know the filenames."
+#### Round 4 — Content layout + assets + special features
 
-7. **Animation & interaction level** — Offer 3-4 levels of motion, but tailor the descriptions to their field. A creative director might see "cinematic page transitions with scroll-triggered reveals", while an accountant might see "clean fade-ins that keep the focus on content".
+Ask about single vs. multi-page (informed by their resume length), what media assets they have, and which special features they want. **Explicitly prompt them to drop any photos, project screenshots, or videos into the repo now**, before building — e.g., "If you have a profile photo or any project screenshots, drag them into the repo and let me know the filenames."
 
-8. **Background & texture** — Suggest 3-4 background treatments that complement the visual styles offered above. These should feel cohesive with the other choices — suggest from the techniques in the Design Aesthetics Mandate.
+Curate special features that are relevant to their profession. A developer might see "GitHub contribution graph widget" and "live project demo embeds"; a consultant might see "client logo carousel" and "case study cards". Always include basics like "downloadable PDF resume" and "contact section".
 
-9. **Special features** — Curate a list of 4-6 extras that are relevant to their profession. A developer might see "GitHub contribution graph widget" and "live project demo embeds"; a consultant might see "client logo carousel" and "case study cards". Always include basics like "downloadable PDF resume" and "contact section".
+**Required coverage checklist — confirm all are answered before moving to Step 5:**
+- [ ] Overall vibe
+- [ ] Light vs. dark (or specific tone)
+- [ ] Color palette
+- [ ] Visual style
+- [ ] Typography feel
+- [ ] Animation & interaction level
+- [ ] Background & texture
+- [ ] Content layout
+- [ ] Photos/media (and prompt to provide files)
+- [ ] Special features
 
-**How to ask:** You MUST use `AskUserQuestion` to cover **all 9 categories** — do not skip any. Batch related categories together (e.g., ask about vibe + color palette in one question, visual style + typography in another, animation + background in another, and content layout + photos/media + special features in another) to keep the conversation flowing without feeling like a long form. Keep the tone conversational and non-technical. After each answer, you may ask a brief follow-up to refine the choice (e.g., if they pick a dark theme, ask "do you want pure black or a softer dark like charcoal/navy?"). The goal is to give users choices they didn't know existed while keeping it feeling easy, not like a quiz.
+#### After all rounds: coherence check
 
-**Required coverage checklist — confirm all 9 are answered before moving to Step 5:**
-- [ ] 1. Overall vibe
-- [ ] 2. Color preference
-- [ ] 3. Visual style
-- [ ] 4. Typography feel
-- [ ] 5. Content layout
-- [ ] 6. Photos/media (and prompt to provide files)
-- [ ] 7. Animation & interaction level
-- [ ] 8. Background & texture
-- [ ] 9. Special features
+Before moving to Step 5, review all the choices together as a set. Ask yourself: do these work as a unified design language? Common incompatibilities to watch for:
+
+- Light background chosen, but color palette is dark-dominant → adjust palette to light variant
+- Minimalist visual style chosen, but heavy animation level chosen → flag the tension and either ask the user or default to subtle motion
+- "Surprise me" on vibe but very specific color constraints → make sure the surprise stays within their color constraint
+- Bold/expressive typography chosen but "clean and simple" visual style → reconcile toward one direction
+
+If you spot a conflict, **resolve it before building** — either by making a sensible judgment call (and telling the user what you decided), or by asking a quick follow-up question. Don't silently apply incompatible choices and hope it works out.
 
 ### Step 5: Generate the Design System
 
