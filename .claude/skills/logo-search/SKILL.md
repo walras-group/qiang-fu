@@ -51,7 +51,7 @@ The `identifier` can be:
 |-------|---------|-------|
 | `token` | required | Your `pk_` publishable key |
 | `size` | `128` | Pixels, max 800 |
-| `format` | `jpg` | `jpg`, `png` (supports transparency), `svg` (Enterprise only) |
+| `format` | `png` | `jpg`, `png` (supports transparency), `svg` (Enterprise only) — **always use `png`** for transparent backgrounds |
 | `theme` | `auto` | `dark` or `light` — only meaningful with transparent images |
 | `greyscale` | `false` | Desaturate the logo |
 | `fallback` | `monogram` | `monogram` (letter icon) or `404` |
@@ -59,7 +59,7 @@ The `identifier` can be:
 
 **Example:**
 ```
-https://img.logo.dev/stripe.com?token=pk_abc123&size=64&format=png
+https://img.logo.dev/stripe.com?token=pk_abc123&size=64&format=png&retina=true
 ```
 
 ### 2. Brand Search API (find domain by name)
@@ -92,7 +92,7 @@ Use the returned `domain` directly in the Logo Image API.
 ## Common Workflows
 
 ### Workflow A: User knows the domain
-Simply construct the image URL:
+Simply construct the image URL. Always use `format=png` for transparent backgrounds:
 ```
 https://img.logo.dev/apple.com?token=pk_YOUR_KEY&size=128&format=png
 ```
@@ -106,12 +106,12 @@ https://img.logo.dev/apple.com?token=pk_YOUR_KEY&size=128&format=png
 The best way to embed logos is to use the `img.logo.dev` URL directly — it's served from a CDN, so no need to download or self-host anything. Logos stay up-to-date automatically.
 
 ```html
-<!-- HTML -->
+<!-- HTML — format=png ensures transparent background -->
 <img src="https://img.logo.dev/stripe.com?token=pk_YOUR_KEY&size=64&format=png" alt="Stripe" />
 ```
 
 ```jsx
-// React
+// React — format=png ensures transparent background
 <img src={`https://img.logo.dev/${domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`} alt={name} />
 ```
 
@@ -125,7 +125,7 @@ The best way to embed logos is to use the `img.logo.dev` URL directly — it's s
 
 - **Key safety:** The `pk_` key is safe to use in frontend/client code. The `sk_` key must stay server-side only (never in browser JS, never committed to git).
 - **Fallback behavior:** By default, logo.dev returns a letter monogram when a logo isn't found. If you want a hard 404 instead, pass `fallback=404`.
-- **Format choice:** Use `png` when transparency matters (e.g., logos on colored backgrounds). Use `jpg` for smaller file size on white backgrounds.
+- **Format choice:** Always use `format=png` — PNG supports transparency so logos render cleanly on any background color. Only use `jpg` if file size is a hard constraint and the background is guaranteed white.
 - **Missing .env:** If keys aren't set, tell the user what's missing and point them to https://www.logo.dev/dashboard/api-keys.
 
 ---
