@@ -1,0 +1,17 @@
+# Generated site (personal — do not commit)
+index.html
+
+# Resume PDF (personal — do not commit)
+*.pdf
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (if any tooling is added)
+node_modules/
