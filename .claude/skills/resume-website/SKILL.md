@@ -73,7 +73,7 @@ The categories to cover:
 
 5. **Content layout** — Single page vs. multi-page, but frame the recommendation based on how much content their resume has. If they have 10+ years of experience and many projects, lean toward multi-page. If it's concise, suggest single page.
 
-6. **Photos/media** — Ask what assets they can provide (profile photo, project screenshots, videos, logos). Adapt suggestions to their role — ask a photographer about gallery images, ask a developer about project demos.
+6. **Photos/media** — Ask what assets they can provide (profile photo, project screenshots, videos, logos). Adapt suggestions to their role — ask a photographer about gallery images, ask a developer about project demos. **Explicitly prompt them to drop any photos or videos into the repo now** (before building) so you can reference them — e.g., "If you have a profile photo or any project screenshots/videos you'd like on the site, add them to the repo and let me know the filenames."
 
 7. **Animation & interaction level** — Offer 3-4 levels of motion, but tailor the descriptions to their field. A creative director might see "cinematic page transitions with scroll-triggered reveals", while an accountant might see "clean fade-ins that keep the focus on content".
 
@@ -81,7 +81,18 @@ The categories to cover:
 
 9. **Special features** — Curate a list of 4-6 extras that are relevant to their profession. A developer might see "GitHub contribution graph widget" and "live project demo embeds"; a consultant might see "client logo carousel" and "case study cards". Always include basics like "downloadable PDF resume" and "contact section".
 
-**How to ask:** Use `AskUserQuestion` for each category (or batch 2-3 related ones). Keep the tone conversational and non-technical. After each answer, you may ask a brief follow-up to refine the choice (e.g., if they pick a dark theme, ask "do you want pure black or a softer dark like charcoal/navy?"). The goal is to give users choices they didn't know existed while keeping it feeling easy, not like a quiz.
+**How to ask:** You MUST use `AskUserQuestion` to cover **all 9 categories** — do not skip any. Batch related categories together (e.g., ask about vibe + color palette in one question, visual style + typography in another, animation + background in another, and content layout + photos/media + special features in another) to keep the conversation flowing without feeling like a long form. Keep the tone conversational and non-technical. After each answer, you may ask a brief follow-up to refine the choice (e.g., if they pick a dark theme, ask "do you want pure black or a softer dark like charcoal/navy?"). The goal is to give users choices they didn't know existed while keeping it feeling easy, not like a quiz.
+
+**Required coverage checklist — confirm all 9 are answered before moving to Step 5:**
+- [ ] 1. Overall vibe
+- [ ] 2. Color preference
+- [ ] 3. Visual style
+- [ ] 4. Typography feel
+- [ ] 5. Content layout
+- [ ] 6. Photos/media (and prompt to provide files)
+- [ ] 7. Animation & interaction level
+- [ ] 8. Background & texture
+- [ ] 9. Special features
 
 ### Step 5: Generate the Design System
 
