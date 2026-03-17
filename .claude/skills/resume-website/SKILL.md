@@ -152,15 +152,40 @@ Match the background technique to the overall aesthetic — a terminal-aesthetic
 
 ## Workflow
 
-### Step 1: Ensure PDF Reader MCP is Available
+### Step 1: Extract the Resume PDF
 
-Before reading any PDF, verify the pdf-reader MCP is installed. If not, install it:
+Use the following approach in order — try the script first, fall back to the MCP only if it fails.
+
+#### Option A: uv script (preferred)
+
+Run the extraction script using `uv`. It handles dependencies automatically with no setup beyond having `uv` installed.
+
+```bash
+uv run .claude/skills/resume-website/scripts/pdf-extract.py <path-to-resume.pdf>
+```
+
+If `uv` is not installed, instruct the user to install it first:
+
+- **macOS / Linux:**
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
+- **Windows (PowerShell):**
+  ```powershell
+  powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+  ```
+
+After installing, re-run the script command above.
+
+#### Option B: pdf-reader MCP (fallback)
+
+If the script fails for any reason, fall back to the pdf-reader MCP. Verify it is installed — if not, install it:
 
 ```bash
 claude mcp add pdf-reader -- npx @sylphx/pdf-reader-mcp
 ```
 
-Then use the MCP's `read_pdf` tool to extract the resume content.
+After installing, **restart Claude Code** for the MCP to become available. Then use the MCP's `read_pdf` tool to extract the resume content.
 
 ### Step 2: Read and Analyze the Resume
 
